@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { enrollCourse, getProgress } from "@/lib/storage";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export function EnrollButton({ slug }: { slug: string }) {
+  const { t } = useLanguage();
   const [enrolled, setEnrolled] = useState(false);
 
   useEffect(() => {
@@ -17,9 +19,9 @@ export function EnrollButton({ slug }: { slug: string }) {
         enrollCourse(slug);
         setEnrolled(true);
       }}
-      className="rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow hover:bg-brand-50"
+      className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-bold text-white shadow-soft hover:bg-brand-600"
     >
-      {enrolled ? "Enrolled ✓" : "Enroll free (demo)"}
+      {enrolled ? `${t("enrolled")} ✓` : t("enroll")}
     </button>
   );
 }

@@ -10,30 +10,44 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#eef9ff",
-          100: "#d9f1ff",
-          200: "#bce7ff",
-          300: "#8ed8ff",
-          400: "#58c0ff",
-          500: "#32a1ff",
-          600: "#1a81f5",
-          700: "#1469e1",
-          800: "#1755b6",
-          900: "#19498f",
-          950: "#142e57",
+          50: "#eefcff",
+          100: "#d5f7ff",
+          200: "#b0efff",
+          300: "#79e4ff",
+          400: "#32d2ff",
+          500: "#00b8ef",
+          600: "#0093cc",
+          700: "#0075a5",
+          800: "#066288",
+          900: "#0b516f",
+          950: "#07344b",
         },
-        accent: {
-          400: "#34d399",
-          500: "#10b981",
-          600: "#059669",
+        ink: {
+          700: "#2c3340",
+          800: "#1c2430",
+          900: "#0f1419",
+        },
+        sand: {
+          50: "#faf8f5",
+          100: "#f3efe8",
+          200: "#e8e0d4",
+        },
+        gold: {
+          500: "#c4a574",
+          600: "#a88855",
         },
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-fraunces)", "Georgia", "serif"],
       },
       boxShadow: {
-        soft: "0 10px 40px -12px rgba(20, 105, 225, 0.25)",
+        soft: "0 18px 50px -20px rgba(0, 147, 204, 0.35)",
+        card: "0 1px 2px rgba(15,20,25,0.04), 0 8px 24px rgba(15,20,25,0.06)",
+      },
+      backgroundImage: {
+        "hero-dots":
+          "radial-gradient(circle at 1px 1px, rgba(0,184,239,0.18) 1px, transparent 0)",
       },
     },
   },

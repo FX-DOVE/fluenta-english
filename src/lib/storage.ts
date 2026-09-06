@@ -131,10 +131,10 @@ export function getActivePlanId(): string | null {
 }
 
 export function getLang(): "en" | "es" | "ja" {
-  if (typeof window === "undefined") return "en";
+  if (typeof window === "undefined") return "es";
   const v = localStorage.getItem(KEYS.lang);
   if (v === "es" || v === "ja" || v === "en") return v;
-  return "en";
+  return "es";
 }
 
 export function setLang(lang: "en" | "es" | "ja") {

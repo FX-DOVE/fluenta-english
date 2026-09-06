@@ -1,6 +1,6 @@
 # Fluenta English
 
-Polished Next.js (App Router) + TypeScript + Tailwind portfolio LM# for Spanish and Japanese speakers learning English.
+Spanish-first Next.js (App Router) + TypeScript + Tailwind portfolio LM# for Spanish and Japanese speakers learning English.
 
 **Live (GitHub Pages):** https://fx-dove.github.io/fluenta-english/
 
@@ -9,7 +9,7 @@ Polished Next.js (App Router) + TypeScript + Tailwind portfolio LM# for Spanish 
 ## Features
 
 - Course catalog (6 courses) with lesson player, quizzes, progress, streaks, certificates
-- EN / ES / JA language toggle on marketing pages
+- ES default + EN / JA toggles on marketing pages
 - Demo auth + progress + orders in `localStorage`
 - Checkout: USDT, BTC, gift card (demo flows)
 - Static export for GitHub Pages (`output: 'export'`, `basePath: /fluenta-english`)

@@ -33,8 +33,8 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6">
-      <h1 className="font-display text-3xl font-bold text-slate-900">Log in</h1>
-      <p className="mt-2 text-sm text-slate-600">Demo auth via localStorage — no password required.</p>
+      <h1 className="font-display text-3xl font-semibold text-ink-900">Entrar</h1>
+      <p className="mt-2 text-sm text-slate-600">Auth demo via localStorage — no password required.</p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Email</span>
@@ -49,15 +49,15 @@ export default function LoginPage() {
         {error && <p className="text-sm text-rose-600">{error}</p>}
         <button
           type="submit"
-          className="w-full rounded-full bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+          className="w-full rounded-full bg-brand-500 py-3 text-sm font-semibold text-white hover:bg-brand-600"
         >
-          Continue
+          Continuar
         </button>
       </form>
       <p className="mt-4 text-center text-sm text-slate-600">
-        New here?{" "}
+        Nuevo aqui?{" "}
         <Link href="/signup/" className="font-semibold text-brand-700 hover:underline">
-          Sign up
+          Registrarse
         </Link>
       </p>
     </div>

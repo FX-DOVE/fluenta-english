@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { COURSES } from "@/data/courses";
 import {
   courseProgressPct,
@@ -12,11 +12,16 @@ import {
 import type { ProgressState, User } from "@/lib/types";
 import { ProgressBar } from "@/components/ProgressBar";
 import { StreakWidget } from "@/components/StreakWidget";
-import { Award, BookOpen, Play } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
+import { Award, BookOpen, LayoutGrid, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [progress, setProgress] = useState<ProgressState>(defaultProgress());
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<"all" | "inprogress" | "done">("all");
 
   useEffect(() => {
     setUser(getUser());
@@ -28,6 +33,19 @@ export default function DashboardPage() {
       progress.enrolled.includes(c.slug) ||
       (progress.completedLessons[c.slug]?.length ?? 0) > 0
   );
+
+  const list = useMemo(() => {
+    const base = enrolledCourses.length ? enrolledCourses : COURSES;
+    return base.filter((c) => {
+      const pct = courseProgressPct(c.slug, c.lessons.length);
+      if (filter === "inprogress" && !(pct > 0 && pct < 100)) return false;
+      if (filter === "done" && pct < 100) return false;
+      const qq = q.trim().toLowerCase();
+      if (qq && !c.title.toLowerCase().includes(qq) && !c.category.toLowerCase().includes(qq))
+        return false;
+      return true;
+    });
+  }, [enrolledCourses, filter, q]);
 
   const continueCourse =
     enrolledCourses.find((c) => courseProgressPct(c.slug, c.lessons.length) < 100) ??
@@ -46,121 +64,190 @@ export default function DashboardPage() {
     );
   })();
 
+  const firstName = user?.name?.split(" ")[0] ?? "";
+  const greeting = user
+    ? t("dash_hi").replace("{name}", firstName)
+    : t("dash_hi_guest");
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-brand-600">Dashboard</p>
-          <h1 className="font-display text-3xl font-bold text-slate-900">
-            {user ? `Welcome back, ${user.name.split(" ")[0]}` : "Your learning hub"}
-          </h1>
-          <p className="mt-1 text-slate-600">
-            Continue learning, track streaks, and unlock certificates.
-          </p>
-        </div>
-        {!user && (
-          <Link
-            href="/signup/"
-            className="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white"
-          >
-            Create demo account
-          </Link>
-        )}
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StreakWidget streak={progress.streak} />
-        <StatCard icon={BookOpen} label="Lessons done" value={String(doneLessons)} />
-        <StatCard
-          icon={Play}
-          label="Courses enrolled"
-          value={String(Math.max(enrolledCourses.length, progress.enrolled.length))}
-        />
-        <StatCard
-          icon={Award}
-          label="Certificates"
-          value={String(progress.certificates.length)}
-        />
-      </div>
-
-      <div className="mt-10 grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <h2 className="mb-4 text-lg font-bold text-slate-900">Continue learning</h2>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className={`mb-4 rounded-xl bg-gradient-to-br ${continueCourse.color} p-4 text-white`}>
-              <p className="text-xs font-semibold opacity-90">{continueCourse.level}</p>
-              <h3 className="text-xl font-bold">{continueCourse.title}</h3>
-            </div>
-            <p className="text-sm text-slate-600">Next up: {nextLesson.title}</p>
-            <ProgressBar
-              className="mt-3"
-              value={courseProgressPct(continueCourse.slug, continueCourse.lessons.length)}
-            />
-            <Link
-              href={`/learn/${continueCourse.slug}/${nextLesson.slug}/`}
-              className="mt-5 inline-flex rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
-            >
-              Resume lesson
+    <div className="bg-sand-50/60 min-h-[70vh]">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-brand-700">{t("dash_title")}</p>
+            <h1 className="font-display text-3xl font-semibold text-ink-900 sm:text-4xl">
+              {greeting}
+            </h1>
+            <p className="mt-1 text-slate-600">{t("dash_sub")}</p>
+          </div>
+          {!user && (
+            <Link href="/signup/" className="btn-primary !py-2">
+              {t("dash_create")}
             </Link>
-          </div>
-
-          <h2 className="mb-4 mt-10 text-lg font-bold text-slate-900">Your courses</h2>
-          <div className="space-y-3">
-            {(enrolledCourses.length ? enrolledCourses : COURSES.slice(0, 3)).map((c) => {
-              const pct = courseProgressPct(c.slug, c.lessons.length);
-              return (
-                <Link
-                  key={c.slug}
-                  href={`/courses/${c.slug}/`}
-                  className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:border-brand-200"
-                >
-                  <div className={`h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br ${c.color}`} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-slate-900">{c.title}</p>
-                    <ProgressBar className="mt-2" value={pct} />
-                  </div>
-                  <span className="text-sm font-bold text-brand-700">{pct}%</span>
-                </Link>
-              );
-            })}
-          </div>
+          )}
         </div>
 
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 className="font-bold text-slate-900">Quick links</h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><Link className="text-brand-700 hover:underline" href="/courses/">Browse catalog</Link></li>
-              <li><Link className="text-brand-700 hover:underline" href="/certificates/">Certificates</Link></li>
-              <li><Link className="text-brand-700 hover:underline" href="/pricing/">Upgrade plan</Link></li>
-            </ul>
+        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+          <div>
+            {/* Continue */}
+            <div className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+              <div className="grid sm:grid-cols-[200px_1fr]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={continueCourse.image}
+                  alt=""
+                  className="h-40 w-full object-cover sm:h-full"
+                />
+                <div className="p-5">
+                  <p className="text-xs font-bold uppercase tracking-wide text-brand-600">
+                    {t("dash_continue")}
+                  </p>
+                  <h2 className="mt-1 text-xl font-bold text-brand-800">
+                    {continueCourse.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {continueCourse.category} · Next: {nextLesson.title}
+                  </p>
+                  <ProgressBar
+                    className="mt-3"
+                    value={courseProgressPct(continueCourse.slug, continueCourse.lessons.length)}
+                  />
+                  <Link
+                    href={`/learn/${continueCourse.slug}/${nextLesson.slug}/`}
+                    className="btn-primary mt-4 !py-2"
+                  >
+                    {t("dash_resume")}
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Moodle-style overview toolbar */}
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-ink-900">{t("dash_overview")}</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as typeof filter)}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="all">{t("dash_filter_all")}</option>
+                  <option value="inprogress">In progress</option>
+                  <option value="done">Completed</option>
+                </select>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder={t("dash_search")}
+                    className="rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none ring-brand-300 focus:ring-2"
+                  />
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+                  <LayoutGrid className="h-4 w-4" />
+                  {t("dash_card_view")}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {list.map((c) => {
+                const pct = courseProgressPct(c.slug, c.lessons.length);
+                return (
+                  <Link
+                    key={c.slug}
+                    href={`/courses/${c.slug}/`}
+                    className={cn(
+                      "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition hover:border-brand-300"
+                    )}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.image} alt="" className="h-32 w-full object-cover" />
+                    <div className="p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        {c.category}
+                      </p>
+                      <h3 className="mt-1 font-bold text-brand-800">{c.title}</h3>
+                      <ProgressBar className="mt-3" value={pct} />
+                      <p className="mt-1 text-xs font-semibold text-slate-500">{pct}%</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-            <p className="font-semibold">Demo tip</p>
-            <p className="mt-1">
-              Progress, auth, and orders persist in your browser&apos;s localStorage.
-            </p>
-          </div>
-        </aside>
+
+          {/* Right sidebar — Moodle widgets */}
+          <aside className="space-y-4">
+            <StreakWidget streak={progress.streak} />
+
+            <div className="grid grid-cols-3 gap-2">
+              <MiniStat icon={BookOpen} label={t("dash_lessons_done")} value={doneLessons} />
+              <MiniStat
+                icon={BookOpen}
+                label={t("dash_enrolled")}
+                value={Math.max(enrolledCourses.length, progress.enrolled.length)}
+              />
+              <MiniStat icon={Award} label={t("dash_certs")} value={progress.certificates.length} />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+              <h3 className="font-bold text-ink-900">{t("dash_announcements")}</h3>
+              <ul className="mt-3 space-y-3 text-sm">
+                <li className="border-l-4 border-brand-400 pl-3">
+                  <p className="font-semibold text-ink-900">Nueva lección LIVE esta semana</p>
+                  <p className="text-xs text-slate-500">Fluenta Team · hoy</p>
+                </li>
+                <li className="border-l-4 border-gold-500 pl-3">
+                  <p className="font-semibold text-ink-900">Consejo: practica 15 min al día</p>
+                  <p className="text-xs text-slate-500">Coach Ana · ayer</p>
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+              <h3 className="font-bold text-ink-900">{t("dash_badges")}</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {["A1", "Racha 3", "Quiz 80%+"].map((b) => (
+                  <span
+                    key={b}
+                    className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-800"
+                  >
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+              <h3 className="font-bold text-ink-900">{t("dash_files")}</h3>
+              <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                <li>phrasebook-a1.pdf</li>
+                <li>irregular-verbs.pdf</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({
+function MiniStat({
   icon: Icon,
   label,
   value,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string;
+  value: number;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <Icon className="mb-2 h-5 w-5 text-brand-600" />
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+    <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
+      <Icon className="mx-auto mb-1 h-4 w-4 text-brand-600" />
+      <p className="text-lg font-bold text-ink-900">{value}</p>
+      <p className="text-[10px] font-medium leading-tight text-slate-500">{label}</p>
     </div>
   );
 }

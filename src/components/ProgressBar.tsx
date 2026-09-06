@@ -13,7 +13,7 @@ export function ProgressBar({
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-slate-100", className)}>
       <div
-        className={cn("h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all", barClassName)}
+        className={cn("h-full rounded-full bg-brand-500 transition-all", barClassName)}
         style={{ width: `${v}%` }}
       />
     </div>

@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/LanguageContext";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
 });
 
-const display = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-fraunces",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Fluenta — English LMS for Spanish & Japanese speakers",
+  title: "Fluenta — Inglés para hispanohablantes",
   description:
-    "Polished portfolio LMS: courses, quizzes, progress, certificates, and demo checkout with USDT, BTC, and gift cards.",
+    "LMS de inglés para hispanohablantes y japonés: cursos, quizzes, rachas, certificados y checkout demo con USDT, BTC y gift cards.",
 };
 
 export default function RootLayout({
@@ -27,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${display.variable} font-sans antialiased`}>
+    <html lang="es">
+      <body className={`${dmSans.variable} ${fraunces.variable} font-sans antialiased text-ink-900`}>
         <LanguageProvider>
           <div className="flex min-h-screen flex-col">
             <Header />

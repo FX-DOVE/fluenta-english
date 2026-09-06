@@ -7,7 +7,7 @@ import { setUser } from "@/lib/storage";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [name, setNombre] = useState("");
   const [email, setEmail] = useState("");
 
   function onSubmit(e: React.FormEvent) {
@@ -23,17 +23,17 @@ export default function SignupPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6">
-      <h1 className="font-display text-3xl font-bold text-slate-900">Sign up</h1>
+      <h1 className="font-display text-3xl font-semibold text-ink-900">Registrarse</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Create a demo account stored only in your browser.
+        Crea una cuenta demo stored only in your browser.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <label className="block text-sm">
-          <span className="font-medium text-slate-700">Name</span>
+          <span className="font-medium text-slate-700">Nombre</span>
           <input
             required
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setNombre(e.target.value)}
             className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none ring-brand-300 focus:ring-2"
           />
         </label>
@@ -49,15 +49,15 @@ export default function SignupPage() {
         </label>
         <button
           type="submit"
-          className="w-full rounded-full bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+          className="w-full rounded-full bg-brand-500 py-3 text-sm font-semibold text-white hover:bg-brand-600"
         >
-          Create account
+          Crear cuenta
         </button>
       </form>
       <p className="mt-4 text-center text-sm text-slate-600">
-        Already have a demo account?{" "}
+        Ya tienes cuenta demo?{" "}
         <Link href="/login/" className="font-semibold text-brand-700 hover:underline">
-          Log in
+          Entrar
         </Link>
       </p>
     </div>

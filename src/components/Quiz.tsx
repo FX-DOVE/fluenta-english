@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { QuizQuestion } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export function Quiz({
   questions,
@@ -12,75 +13,138 @@ export function Quiz({
   questions: QuizQuestion[];
   onComplete?: (pct: number) => void;
 }) {
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const { t } = useLanguage();
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
 
-  const score = useMemo(() => {
-    if (!questions.length) return 0;
-    let correct = 0;
-    for (const q of questions) {
-      if (answers[q.id] === q.correctIndex) correct += 1;
+  const q = questions[index];
+
+  function finish(nextCorrect: number) {
+    const pct = Math.round((nextCorrect / questions.length) * 100);
+    setFinalScore(pct);
+    setFinished(true);
+    onComplete?.(pct);
+  }
+
+  function onCheck() {
+    if (selected === null) return;
+    setChecked(true);
+    if (selected === q.correctIndex) {
+      setCorrectCount((c) => c + 1);
     }
-    return Math.round((correct / questions.length) * 100);
-  }, [answers, questions]);
+  }
 
-  function submit() {
-    setSubmitted(true);
-    onComplete?.(score);
+  function onNext() {
+    const tally =
+      checked && selected === q.correctIndex ? correctCount : correctCount;
+    // correctCount already updated in onCheck when correct
+    if (index + 1 >= questions.length) {
+      finish(tally);
+      return;
+    }
+    setIndex((i) => i + 1);
+    setSelected(null);
+    setChecked(false);
+  }
+
+  function skip() {
+    if (index + 1 >= questions.length) {
+      finish(correctCount);
+      return;
+    }
+    setIndex((i) => i + 1);
+    setSelected(null);
+    setChecked(false);
+  }
+
+  if (finished) {
+    return (
+      <div className="mt-8 rounded-2xl border border-brand-100 bg-brand-50/60 p-6">
+        <h3 className="text-lg font-bold text-ink-900">{t("quiz_title")}</h3>
+        <p className="mt-3 text-2xl font-bold text-brand-700">
+          {t("quiz_score")}: {finalScore}%
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="mt-8 rounded-2xl border border-brand-100 bg-brand-50/50 p-5 sm:p-6">
-      <h3 className="mb-4 text-lg font-bold text-brand-900">Interactive quiz</h3>
-      <div className="space-y-6">
-        {questions.map((q, i) => (
-          <div key={q.id}>
-            <p className="mb-3 text-sm font-semibold text-slate-800">
-              {i + 1}. {q.prompt}
-            </p>
-            <div className="grid gap-2">
-              {q.options.map((opt, oi) => {
-                const selected = answers[q.id] === oi;
-                const isCorrect = oi === q.correctIndex;
-                const show = submitted;
-                return (
-                  <button
-                    key={oi}
-                    type="button"
-                    disabled={submitted}
-                    onClick={() => setAnswers((a) => ({ ...a, [q.id]: oi }))}
-                    className={cn(
-                      "flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition",
-                      !show && selected && "border-brand-500 bg-white ring-2 ring-brand-200",
-                      !show && !selected && "border-slate-200 bg-white hover:border-brand-300",
-                      show && isCorrect && "border-accent-500 bg-emerald-50 text-emerald-900",
-                      show && selected && !isCorrect && "border-rose-400 bg-rose-50 text-rose-900"
-                    )}
-                  >
-                    <span>{opt}</span>
-                    {show && isCorrect && <CheckCircle2 className="h-4 w-4 text-accent-600" />}
-                    {show && selected && !isCorrect && <XCircle className="h-4 w-4 text-rose-500" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-bold text-ink-900">{t("quiz_title")}</h3>
+        <div className="flex gap-1.5">
+          {questions.map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "h-2.5 w-2.5 rounded-full",
+                i < index ? "bg-emerald-500" : i === index ? "bg-brand-500" : "bg-slate-200"
+              )}
+            />
+          ))}
+        </div>
       </div>
-      {!submitted ? (
+
+      <p className="mb-4 text-base font-semibold text-ink-900">
+        {index + 1}. {q.prompt}
+      </p>
+      <div className="grid gap-2">
+        {q.options.map((opt, oi) => {
+          const isSel = selected === oi;
+          const isCorrect = oi === q.correctIndex;
+          return (
+            <button
+              key={oi}
+              type="button"
+              disabled={checked}
+              onClick={() => setSelected(oi)}
+              className={cn(
+                "flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition",
+                !checked && isSel && "border-brand-500 bg-brand-50 ring-2 ring-brand-200",
+                !checked && !isSel && "border-slate-200 hover:border-brand-300",
+                checked && isCorrect && "border-emerald-500 bg-emerald-50 text-emerald-900",
+                checked && isSel && !isCorrect && "border-rose-400 bg-rose-50 text-rose-900"
+              )}
+            >
+              <span>{opt}</span>
+              {checked && isCorrect && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+              {checked && isSel && !isCorrect && <XCircle className="h-4 w-4 text-rose-500" />}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
         <button
           type="button"
-          disabled={Object.keys(answers).length < questions.length}
-          onClick={submit}
-          className="mt-6 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={skip}
+          className="text-sm font-semibold text-brand-700 hover:underline"
         >
-          Check answers
+          {t("learn_skip")}
         </button>
-      ) : (
-        <div className="mt-6 rounded-xl bg-white p-4 text-sm font-semibold text-slate-800 shadow-sm">
-          Your score: <span className="text-brand-700">{score}%</span>
-        </div>
-      )}
+        {!checked ? (
+          <button
+            type="button"
+            disabled={selected === null}
+            onClick={onCheck}
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {t("learn_check")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onNext}
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-bold text-white"
+          >
+            {index + 1 >= questions.length ? t("quiz_score") : t("learn_next")}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

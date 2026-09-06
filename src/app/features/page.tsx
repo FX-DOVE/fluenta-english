@@ -33,7 +33,7 @@ const items = [
   },
   {
     icon: Award,
-    title: "Certificates",
+    title: "Certificados",
     body: "Finish every lesson in a course to unlock a certificate you can view anytime.",
   },
   {
@@ -58,7 +58,7 @@ export default function FeaturesPage() {
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">Product</p>
-        <h1 className="mt-2 font-display text-4xl font-bold text-slate-900">Built like a real LMS</h1>
+        <h1 className="mt-2 font-display text-4xl font-semibold text-ink-900">Hecho para hablar con confianza</h1>
         <p className="mt-3 text-slate-600">
           Fluenta showcases the learning loop end-to-end—from discovery to certificate—without a backend.
         </p>
@@ -67,7 +67,7 @@ export default function FeaturesPage() {
         {items.map((it) => (
           <div key={it.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <it.icon className="mb-3 h-6 w-6 text-brand-600" />
-            <h2 className="font-bold text-slate-900">{it.title}</h2>
+            <h2 className="font-bold text-ink-900">{it.title}</h2>
             <p className="mt-2 text-sm text-slate-600">{it.body}</p>
           </div>
         ))}
@@ -75,7 +75,7 @@ export default function FeaturesPage() {
       <div className="mt-12 text-center">
         <Link
           href="/courses/"
-          className="inline-flex rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+          className="inline-flex rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
         >
           Explore courses
         </Link>

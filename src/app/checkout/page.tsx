@@ -7,8 +7,10 @@ import type { Order, PaymentMethod, PlanId } from "@/lib/types";
 import { addOrder } from "@/lib/storage";
 import { DEMO_WALLETS, cn } from "@/lib/utils";
 import { Bitcoin, Copy, CreditCard, Gift, Check } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 function CheckoutInner() {
+  const { t } = useLanguage();
   const params = useSearchParams();
   const router = useRouter();
   const planId = (params.get("plan") as PlanId) || "3m";
@@ -33,7 +35,7 @@ function CheckoutInner() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError("Could not copy — select the address manually.");
+      setError("No se pudo copiar — selecciona la dirección manualmente.");
     }
   }
 
@@ -59,7 +61,7 @@ function CheckoutInner() {
 
   function onCryptoConfirm() {
     if (!txNote.trim()) {
-      setError("Add a short note (e.g. demo TX id) to confirm payment.");
+      setError("Añade una nota breve (p. ej. TX id demo) para confirmar el pago.");
       return;
     }
     placeOrder("confirmed");
@@ -67,7 +69,7 @@ function CheckoutInner() {
 
   function onGiftRedeem() {
     if (!giftCode.trim() || giftCode.trim().length < 4) {
-      setError("Enter a gift card code (min 4 characters).");
+      setError("Introduce un código de gift card (mín. 4 caracteres).");
       return;
     }
     placeOrder("redeemed");
@@ -75,25 +77,23 @@ function CheckoutInner() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <h1 className="font-display text-3xl font-bold text-slate-900">Checkout</h1>
-      <p className="mt-2 text-slate-600">
-        Demo payments only — no real funds are transferred.
-      </p>
+      <h1 className="font-display text-3xl font-semibold text-ink-900">{t("checkout_title")}</h1>
+      <p className="mt-2 text-slate-600">{t("checkout_sub")}</p>
 
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-slate-500">Selected plan</p>
-            <p className="text-xl font-bold text-slate-900">
-              {plan.name} · {plan.months} months
+            <p className="text-sm text-slate-500">{t("checkout_plan")}</p>
+            <p className="text-xl font-bold text-ink-900">
+              {plan.name} · {plan.months} meses
             </p>
           </div>
-          <p className="text-3xl font-bold text-brand-700">${plan.price}</p>
+          <p className="font-display text-4xl font-semibold text-brand-700">${plan.price}</p>
         </div>
       </div>
 
       <div className="mt-6">
-        <p className="mb-3 text-sm font-semibold text-slate-800">Payment method</p>
+        <p className="mb-3 text-sm font-semibold text-ink-800">{t("checkout_method")}</p>
         <div className="grid gap-3 sm:grid-cols-3">
           {(
             [
@@ -126,11 +126,11 @@ function CheckoutInner() {
       {(method === "usdt" || method === "btc") && (
         <div className="mt-6 space-y-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-6">
           <div className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-900">
-            DEMO WALLET — do not send real {method.toUpperCase()}
+            WALLET DEMO — no envíes {method.toUpperCase()} real
           </div>
           <div>
             <p className="text-sm font-medium text-slate-700">
-              Send ${plan.price} in {method.toUpperCase()} to:
+              Envía ${plan.price} en {method.toUpperCase()} a:
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <code className="break-all rounded-xl bg-white px-3 py-2 text-xs text-slate-800 ring-1 ring-slate-200">
@@ -139,19 +139,19 @@ function CheckoutInner() {
               <button
                 type="button"
                 onClick={copyWallet}
-                className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+                className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-3 py-2 text-xs font-semibold text-white"
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? "Copied" : "Copy"}
+                {copied ? "Copiado" : "Copiar"}
               </button>
             </div>
           </div>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">Payment note / demo TX id</span>
+            <span className="font-medium text-slate-700">Nota de pago / TX id demo</span>
             <input
               value={txNote}
               onChange={(e) => setTxNote(e.target.value)}
-              placeholder="e.g. DEMO-TX-12345"
+              placeholder="p. ej. DEMO-TX-12345"
               className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none ring-brand-300 focus:ring-2"
             />
           </label>
@@ -159,20 +159,20 @@ function CheckoutInner() {
             type="button"
             disabled={confirming}
             onClick={onCryptoConfirm}
-            className="w-full rounded-full bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+            className="w-full rounded-full bg-brand-500 py-3 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60"
           >
-            Confirm {method.toUpperCase()} payment
+            Confirmar pago {method.toUpperCase()}
           </button>
         </div>
       )}
 
       {method === "giftcard" && (
-        <div className="mt-6 space-y-4 rounded-2xl border border-violet-200 bg-violet-50/60 p-6">
-          <p className="text-sm text-violet-900">
-            Enter any demo gift code (4+ characters). PIN is optional.
+        <div className="mt-6 space-y-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-6">
+          <p className="text-sm text-brand-900">
+            Introduce cualquier código demo (4+ caracteres). El PIN es opcional.
           </p>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">Gift card code</span>
+            <span className="font-medium text-slate-700">Código gift card</span>
             <input
               value={giftCode}
               onChange={(e) => setGiftCode(e.target.value)}
@@ -181,7 +181,7 @@ function CheckoutInner() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">PIN (optional)</span>
+            <span className="font-medium text-slate-700">PIN (opcional)</span>
             <input
               value={giftPin}
               onChange={(e) => setGiftPin(e.target.value)}
@@ -193,9 +193,9 @@ function CheckoutInner() {
             type="button"
             disabled={confirming}
             onClick={onGiftRedeem}
-            className="w-full rounded-full bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-60"
+            className="w-full rounded-full bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
           >
-            Redeem gift card
+            Canjear gift card
           </button>
         </div>
       )}
@@ -209,7 +209,7 @@ function CheckoutInner() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center text-slate-500">Loading checkout…</div>}>
+    <Suspense fallback={<div className="p-10 text-center text-slate-500">Cargando checkout…</div>}>
       <CheckoutInner />
     </Suspense>
   );

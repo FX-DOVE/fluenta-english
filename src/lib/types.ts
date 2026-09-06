@@ -26,6 +26,8 @@ export interface Lesson {
   quiz?: QuizQuestion[];
 }
 
+export type CourseBadge = "Bestseller" | "Nuevo" | "Popular" | null;
+
 export interface Course {
   slug: string;
   title: string;
@@ -36,6 +38,15 @@ export interface Course {
   description: string;
   outcomes: string[];
   color: string;
+  cefr: "A1" | "A2" | "B1" | "B2" | "C1";
+  instructor: string;
+  instructorTitle: string;
+  rating: number;
+  reviewCount: number;
+  hours: number;
+  badge: CourseBadge;
+  image: string;
+  lessonCountLabel?: string;
 }
 
 export interface User {
@@ -61,9 +72,9 @@ export interface Order {
 
 export interface ProgressState {
   enrolled: string[];
-  completedLessons: Record<string, string[]>; // courseSlug -> lessonSlugs
-  quizScores: Record<string, number>; // lessonKey -> score pct
-  certificates: string[]; // courseSlugs
+  completedLessons: Record<string, string[]>;
+  quizScores: Record<string, number>;
+  certificates: string[];
   streak: number;
   lastStudyDate: string | null;
   completedAt: Record<string, string>;

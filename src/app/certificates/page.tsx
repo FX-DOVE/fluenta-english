@@ -7,7 +7,7 @@ import { defaultProgress, getProgress, getUser } from "@/lib/storage";
 import type { ProgressState, User } from "@/lib/types";
 import { Award } from "lucide-react";
 
-export default function CertificatesPage() {
+export default function CertificadosPage() {
   const [progress, setProgress] = useState<ProgressState>(defaultProgress());
   const [user, setUser] = useState<User | null>(null);
 
@@ -24,7 +24,7 @@ export default function CertificatesPage() {
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">
           Achievements
         </p>
-        <h1 className="mt-2 font-display text-4xl font-bold text-slate-900">Certificates</h1>
+        <h1 className="mt-2 font-display text-4xl font-semibold text-ink-900">Certificados</h1>
         <p className="mt-3 text-slate-600">
           Complete every lesson in a course to unlock a certificate. Progress is stored locally.
         </p>
@@ -33,15 +33,15 @@ export default function CertificatesPage() {
       {certs.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
           <Award className="mx-auto h-10 w-10 text-slate-400" />
-          <p className="mt-3 font-semibold text-slate-800">No certificates yet</p>
+          <p className="mt-3 font-semibold text-slate-800">Aun no hay certificados</p>
           <p className="mt-1 text-sm text-slate-600">
             Finish a course at 100% to unlock your first certificate.
           </p>
           <Link
             href="/courses/"
-            className="mt-5 inline-flex rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white"
+            className="mt-5 inline-flex rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
           >
-            Go to courses
+            Ir a cursos
           </Link>
         </div>
       ) : (
@@ -61,7 +61,7 @@ export default function CertificatesPage() {
               </div>
               <div className="px-6 py-8 text-center">
                 <p className="text-sm text-slate-500">This certifies that</p>
-                <p className="mt-1 font-display text-2xl font-bold text-slate-900">
+                <p className="mt-1 font-display text-2xl font-bold text-ink-900">
                   {user?.name ?? "Fluenta Learner"}
                 </p>
                 <p className="mt-3 text-sm text-slate-600">has successfully completed</p>
