@@ -25,11 +25,10 @@ Polished Next.js (App Router) + TypeScript + Tailwind portfolio LM# for Spanish 
 ## Local development
 
 ```bash
-npm install
-npm run dev
+npm install && npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open http://localhost:3000
 
 ## Production build (static)
 
@@ -37,17 +36,19 @@ Open [http://localhost:3000](http://localhost:3000).
 npm run build
 ```
 
-Output is written to `out/` (used by GitHub Pages).
+Output is written to `out/` (published from the `gh-pages` branch).
 
-## Deploy
+## Deploy (GitHub Pages)
 
-Push to `main` triggers `.github/workflows/deploy.yml`, which builds the static export and deploys via GitHub Pages (Actions).
+Currently deployed from the **`gh-pages`** branch (legacy Pages source). Rebuild and republish the static `out/` folder to `the gh-pages branch.
+
+An Actions workflow template lives at `deploy.workflow.yml.example`. Renaming it to `.github/workflows/deploy.yml` requires a GitHub token with the `workflow` scope.
 
 ## Routes
 
 - `/` Landing
 - `/features`
-- `/courses`, `/courses/[slugT`
+- `/courses`, `/courses/[slug]`
 - `/learn/[courseSlug]/[lessonSlug]`
 - `/dashboard`
 - `/pricing`
