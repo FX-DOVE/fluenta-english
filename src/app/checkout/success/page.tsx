@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getOrders } from "@/lib/storage";
-import { getPlan } from "@/data/plans";
+import { getPlan, planNameKey } from "@/data/plans";
 import type { Order } from "@/lib/types";
 import { CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 function SuccessInner() {
+  const { t } = useLanguage();
   const params = useSearchParams();
   const [order, setOrder] = useState<Order | null>(null);
 
@@ -25,18 +27,20 @@ function SuccessInner() {
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-accent-600">
         <CheckCircle2 className="h-9 w-9" />
       </div>
-      <h1 className="mt-6 font-display text-3xl font-semibold text-ink-900">
-        Pago registrado
-      </h1>
-      <p className="mt-3 text-slate-600">
-        This is a demo confirmation. Your plan access is saved in localStorage.
-      </p>
+      <h1 className="mt-6 font-display text-3xl font-semibold text-ink-900">{t("success_title")}</h1>
+      <p className="mt-3 text-slate-600">{t("success_sub")}</p>
       {order && (
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 text-left text-sm shadow-sm">
-          <Row label="Order" value={order.id} />
-          <Row label="Plan" value={plan ? `${plan.name} ($${plan.price})` : order.planId} />
-          <Row label="Method" value={order.method.toUpperCase()} />
-          <Row label="Status" value={order.status} />
+          <Row label={t("success_order")} value={order.id} />
+          <Row
+            label={t("success_plan")}
+            value={plan ? `${t(planNameKey(plan.id))} ($${plan.price})` : order.planId}
+          />
+          <Row
+            label={t("success_method")}
+            value={order.method === "giftcard" ? t("checkout_giftcard") : order.method.toUpperCase()}
+          />
+          <Row label={t("success_status")} value={order.status} />
         </div>
       )}
       <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -44,13 +48,13 @@ function SuccessInner() {
           href="/dashboard/"
           className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
         >
-          Ir al panel
+          {t("success_dash")}
         </Link>
         <Link
           href="/courses/"
           className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800"
         >
-          Ver cursos
+          {t("success_courses")}
         </Link>
       </div>
     </div>
@@ -66,9 +70,14 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+function SuccessFallback() {
+  const { t } = useLanguage();
+  return <div className="p-10 text-center">{t("success_loading")}</div>;
+}
+
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center">Cargando…</div>}>
+    <Suspense fallback={<SuccessFallback />}>
       <SuccessInner />
     </Suspense>
   );

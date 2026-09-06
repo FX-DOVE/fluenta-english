@@ -23,7 +23,7 @@ export function Footer() {
             <li><Link href="/features/" className="hover:text-brand-700">{t("nav_features")}</Link></li>
             <li><Link href="/courses/" className="hover:text-brand-700">{t("nav_courses")}</Link></li>
             <li><Link href="/pricing/" className="hover:text-brand-700">{t("nav_pricing")}</Link></li>
-            <li><Link href="/certificates/" className="hover:text-brand-700">Certificados</Link></li>
+            <li><Link href="/certificates/" className="hover:text-brand-700">{t("nav_certificates")}</Link></li>
           </ul>
         </div>
         <div>

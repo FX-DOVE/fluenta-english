@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getPlan } from "@/data/plans";
+import { getPlan, planNameKey } from "@/data/plans";
 import type { Order, PaymentMethod, PlanId } from "@/lib/types";
 import { addOrder } from "@/lib/storage";
 import { DEMO_WALLETS, cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ function CheckoutInner() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError("No se pudo copiar — selecciona la dirección manualmente.");
+      setError(t("checkout_err_copy"));
     }
   }
 
@@ -61,7 +61,7 @@ function CheckoutInner() {
 
   function onCryptoConfirm() {
     if (!txNote.trim()) {
-      setError("Añade una nota breve (p. ej. TX id demo) para confirmar el pago.");
+      setError(t("checkout_err_tx"));
       return;
     }
     placeOrder("confirmed");
@@ -69,7 +69,7 @@ function CheckoutInner() {
 
   function onGiftRedeem() {
     if (!giftCode.trim() || giftCode.trim().length < 4) {
-      setError("Introduce un código de gift card (mín. 4 caracteres).");
+      setError(t("checkout_err_gift"));
       return;
     }
     placeOrder("redeemed");
@@ -85,7 +85,7 @@ function CheckoutInner() {
           <div>
             <p className="text-sm text-slate-500">{t("checkout_plan")}</p>
             <p className="text-xl font-bold text-ink-900">
-              {plan.name} · {plan.months} meses
+              {t(planNameKey(plan.id))} · {plan.months} {t("checkout_months")}
             </p>
           </div>
           <p className="font-display text-4xl font-semibold text-brand-700">${plan.price}</p>
@@ -99,7 +99,7 @@ function CheckoutInner() {
             [
               ["usdt", "USDT", CreditCard],
               ["btc", "BTC", Bitcoin],
-              ["giftcard", "Gift card", Gift],
+              ["giftcard", t("checkout_giftcard"), Gift],
             ] as const
           ).map(([id, label, Icon]) => (
             <button
@@ -126,11 +126,11 @@ function CheckoutInner() {
       {(method === "usdt" || method === "btc") && (
         <div className="mt-6 space-y-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-6">
           <div className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-900">
-            WALLET DEMO — no envíes {method.toUpperCase()} real
+            {t("checkout_wallet_warn", { method: method.toUpperCase() })}
           </div>
           <div>
             <p className="text-sm font-medium text-slate-700">
-              Envía ${plan.price} en {method.toUpperCase()} a:
+              {t("checkout_send", { amount: plan.price, method: method.toUpperCase() })}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <code className="break-all rounded-xl bg-white px-3 py-2 text-xs text-slate-800 ring-1 ring-slate-200">
@@ -142,16 +142,16 @@ function CheckoutInner() {
                 className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-3 py-2 text-xs font-semibold text-white"
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? "Copiado" : "Copiar"}
+                {copied ? t("checkout_copied") : t("checkout_copy")}
               </button>
             </div>
           </div>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">Nota de pago / TX id demo</span>
+            <span className="font-medium text-slate-700">{t("checkout_tx_label")}</span>
             <input
               value={txNote}
               onChange={(e) => setTxNote(e.target.value)}
-              placeholder="p. ej. DEMO-TX-12345"
+              placeholder={t("checkout_tx_ph")}
               className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none ring-brand-300 focus:ring-2"
             />
           </label>
@@ -161,18 +161,16 @@ function CheckoutInner() {
             onClick={onCryptoConfirm}
             className="w-full rounded-full bg-brand-500 py-3 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60"
           >
-            Confirmar pago {method.toUpperCase()}
+            {t("checkout_confirm", { method: method.toUpperCase() })}
           </button>
         </div>
       )}
 
       {method === "giftcard" && (
         <div className="mt-6 space-y-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-6">
-          <p className="text-sm text-brand-900">
-            Introduce cualquier código demo (4+ caracteres). El PIN es opcional.
-          </p>
+          <p className="text-sm text-brand-900">{t("checkout_gift_help")}</p>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">Código gift card</span>
+            <span className="font-medium text-slate-700">{t("checkout_gift_code")}</span>
             <input
               value={giftCode}
               onChange={(e) => setGiftCode(e.target.value)}
@@ -181,7 +179,7 @@ function CheckoutInner() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-slate-700">PIN (opcional)</span>
+            <span className="font-medium text-slate-700">{t("checkout_gift_pin")}</span>
             <input
               value={giftPin}
               onChange={(e) => setGiftPin(e.target.value)}
@@ -195,7 +193,7 @@ function CheckoutInner() {
             onClick={onGiftRedeem}
             className="w-full rounded-full bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
           >
-            Canjear gift card
+            {t("checkout_redeem")}
           </button>
         </div>
       )}
@@ -209,8 +207,17 @@ function CheckoutInner() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center text-slate-500">Cargando checkout…</div>}>
+    <Suspense
+      fallback={
+        <CheckoutFallback />
+      }
+    >
       <CheckoutInner />
     </Suspense>
   );
+}
+
+function CheckoutFallback() {
+  const { t } = useLanguage();
+  return <div className="p-10 text-center text-slate-500">{t("checkout_loading")}</div>;
 }

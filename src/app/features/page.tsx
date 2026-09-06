@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Award,
   BookOpen,
@@ -9,59 +11,28 @@ import {
   Flame,
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
 
-const items = [
-  {
-    icon: BookOpen,
-    title: "Course catalog & enrollment",
-    body: "Browse six polished demo courses, enroll in one click, and keep enrollments in localStorage.",
-  },
-  {
-    icon: PlayCircle,
-    title: "Lesson player",
-    body: "Curriculum sidebar, readable lesson content, mark complete, and resume where you left off.",
-  },
-  {
-    icon: ListChecks,
-    title: "Interactive quizzes",
-    body: "Score yourself with multiple-choice quizzes embedded in key lessons.",
-  },
-  {
-    icon: LineChart,
-    title: "Progress bars",
-    body: "Per-course completion percentages drive the dashboard and certificate unlocks.",
-  },
-  {
-    icon: Award,
-    title: "Certificados",
-    body: "Finish every lesson in a course to unlock a certificate you can view anytime.",
-  },
-  {
-    icon: Flame,
-    title: "Streak widget",
-    body: "Daily study touches update your streak so motivation stays visible.",
-  },
-  {
-    icon: Languages,
-    title: "EN / ES / JA toggle",
-    body: "Marketing pages switch copy instantly for Spanish and Japanese speakers.",
-  },
-  {
-    icon: CreditCard,
-    title: "Demo checkout",
-    body: "USDT, BTC, and gift-card flows with persisted demo orders—clearly labeled as simulation.",
-  },
-];
+const ICONS = [BookOpen, PlayCircle, ListChecks, LineChart, Award, Flame, Languages, CreditCard];
 
 export default function FeaturesPage() {
+  const { t } = useLanguage();
+  const items = [1, 2, 3, 4, 5, 6, 7, 8].map((n, i) => ({
+    icon: ICONS[i],
+    title: t(`feat_${n}_t`),
+    body: t(`feat_${n}_d`),
+  }));
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">Product</p>
-        <h1 className="mt-2 font-display text-4xl font-semibold text-ink-900">Hecho para hablar con confianza</h1>
-        <p className="mt-3 text-slate-600">
-          Fluenta showcases the learning loop end-to-end—from discovery to certificate—without a backend.
+        <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">
+          {t("feat_page_eyebrow")}
         </p>
+        <h1 className="mt-2 font-display text-4xl font-semibold text-ink-900">
+          {t("feat_page_title")}
+        </h1>
+        <p className="mt-3 text-slate-600">{t("feat_page_sub")}</p>
       </div>
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((it) => (
@@ -77,7 +48,7 @@ export default function FeaturesPage() {
           href="/courses/"
           className="inline-flex rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
         >
-          Explore courses
+          {t("feat_page_cta")}
         </Link>
       </div>
     </div>

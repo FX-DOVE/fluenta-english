@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getUser, setUser } from "@/lib/storage";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -18,10 +20,9 @@ export default function LoginPage() {
       return;
     }
     if (existing) {
-      setError("No matching demo account for that email. Try sign up or use the email you registered.");
+      setError(t("login_err"));
       return;
     }
-    // Auto-create lightweight demo session
     setUser({
       id: `u_${Date.now()}`,
       name: email.split("@")[0] || "Learner",
@@ -33,11 +34,11 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6">
-      <h1 className="font-display text-3xl font-semibold text-ink-900">Entrar</h1>
-      <p className="mt-2 text-sm text-slate-600">Auth demo via localStorage — no password required.</p>
+      <h1 className="font-display text-3xl font-semibold text-ink-900">{t("login_title")}</h1>
+      <p className="mt-2 text-sm text-slate-600">{t("login_sub")}</p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <label className="block text-sm">
-          <span className="font-medium text-slate-700">Email</span>
+          <span className="font-medium text-slate-700">{t("login_email")}</span>
           <input
             type="email"
             required
@@ -51,13 +52,13 @@ export default function LoginPage() {
           type="submit"
           className="w-full rounded-full bg-brand-500 py-3 text-sm font-semibold text-white hover:bg-brand-600"
         >
-          Continuar
+          {t("login_continue")}
         </button>
       </form>
       <p className="mt-4 text-center text-sm text-slate-600">
-        Nuevo aqui?{" "}
+        {t("login_new")}{" "}
         <Link href="/signup/" className="font-semibold text-brand-700 hover:underline">
-          Registrarse
+          {t("login_signup_link")}
         </Link>
       </p>
     </div>

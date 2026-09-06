@@ -5,30 +5,15 @@ import { ArrowRight, Play, Volume2 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { COURSES } from "@/data/courses";
 import { CourseCard } from "@/components/CourseCard";
-
-const testimonials = [
-  {
-    name: "María G.",
-    loc: "Madrid",
-    quote:
-      "Por fin entendí los artículos. Los quizzes me mantienen honesta y la racha me motiva cada día.",
-  },
-  {
-    name: "Hiroshi T.",
-    loc: "Osaka",
-    quote:
-      "Pronunciation Power aclaró mi R/L. El reproductor de lecciones es limpio y enfocado.",
-  },
-  {
-    name: "Lucía R.",
-    loc: "Ciudad de México",
-    quote:
-      "Me encanta el panel estilo Moodle. Pagar con USDT en el checkout demo fue sorprendentemente fluido.",
-  },
-];
+import { CATEGORY_KEYS, categoryLabel } from "@/lib/i18n";
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const testimonials = [
+    { name: "María G.", loc: t("t_1_loc"), quote: t("t_1_quote") },
+    { name: "Hiroshi T.", loc: t("t_2_loc"), quote: t("t_2_quote") },
+    { name: "Lucía R.", loc: t("t_3_loc"), quote: t("t_3_quote") },
+  ];
   const popular = COURSES.filter((c) => c.badge === "Bestseller" || c.badge === "Popular");
   const speaking = COURSES.filter((c) => c.category === "Speaking");
 
@@ -137,7 +122,7 @@ export default function HomePage() {
       <section className="border-y border-slate-100 bg-sand-50/80 py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
-            {["General", "Speaking", "Grammar", "Career", "Listening"].map((cat) => {
+            {CATEGORY_KEYS.map((cat) => {
               const sample = COURSES.find((c) => c.category === cat) ?? COURSES[0];
               return (
                 <Link
@@ -152,7 +137,9 @@ export default function HomePage() {
                     className="h-full w-full object-cover transition group-hover:scale-105"
                   />
                   <span className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/20 to-transparent" />
-                  <span className="absolute bottom-3 left-3 text-sm font-bold text-white">{cat}</span>
+                  <span className="absolute bottom-3 left-3 text-sm font-bold text-white">
+                    {categoryLabel(lang, cat)}
+                  </span>
                 </Link>
               );
             })}
@@ -225,9 +212,9 @@ export default function HomePage() {
             <p className="mt-3 text-slate-600">{t("features_sub")}</p>
             <ul className="mt-6 space-y-4">
               {[
-                ["A1 → B2", "Rutas CEFR claras con badges de nivel."],
-                ["Quizzes Khan-style", "Saltar / Comprobar con feedback inmediato."],
-                ["Panel Moodle", "Hola + filtros + anuncios + rachas."],
+                [t("feat_bullet_1_t"), t("feat_bullet_1_d")],
+                [t("feat_bullet_2_t"), t("feat_bullet_2_d")],
+                [t("feat_bullet_3_t"), t("feat_bullet_3_d")],
               ].map(([title, body]) => (
                 <li key={title} className="flex gap-3">
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-500" />
@@ -252,8 +239,8 @@ export default function HomePage() {
               />
             </div>
             <div className="absolute -bottom-4 -left-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-soft sm:left-4">
-              <p className="text-xs font-semibold text-slate-500">italki-style</p>
-              <p className="text-sm font-bold text-ink-900">★ 4.8 · 2.1k ratings</p>
+              <p className="text-xs font-semibold text-slate-500">{t("feat_rating_label")}</p>
+              <p className="text-sm font-bold text-ink-900">{t("feat_rating_value")}</p>
             </div>
           </div>
         </div>

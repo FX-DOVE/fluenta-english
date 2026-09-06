@@ -1,18 +1,13 @@
-import type { Plan } from "@/lib/types";
+import type { Plan, PlanId } from "@/lib/types";
 
+/** Feature keys resolved via t() in UI — names/features localized */
 export const PLANS: Plan[] = [
   {
     id: "2m",
     name: "Starter",
     months: 2,
     price: 100,
-    features: [
-      "Acceso a los 6 cursos",
-      "Quizzes interactivos y progreso",
-      "Certificados de finalización",
-      "Interfaz ES / EN / JA",
-      "Soporte por email",
-    ],
+    features: ["plan_2m_f1", "plan_2m_f2", "plan_2m_f3", "plan_2m_f4", "plan_2m_f5"],
   },
   {
     id: "3m",
@@ -20,29 +15,21 @@ export const PLANS: Plan[] = [
     months: 3,
     price: 150,
     popular: true,
-    features: [
-      "Todo lo de Starter",
-      "Ruta de lecciones prioritaria",
-      "Rachas y panel de avance",
-      "Checkout con gift card",
-      "Soporte prioritario",
-    ],
+    features: ["plan_3m_f1", "plan_3m_f2", "plan_3m_f3", "plan_3m_f4", "plan_3m_f5"],
   },
   {
     id: "1y",
     name: "Año Fluido",
     months: 12,
     price: 500,
-    features: [
-      "Todo lo de Más popular",
-      "Acceso de un año (mejor valor)",
-      "Actualizaciones de cursos",
-      "Archivo de certificados",
-      "Plantilla de plan de estudio 1:1",
-    ],
+    features: ["plan_1y_f1", "plan_1y_f2", "plan_1y_f3", "plan_1y_f4", "plan_1y_f5"],
   },
 ];
 
 export function getPlan(id: string | null | undefined): Plan | undefined {
   return PLANS.find((p) => p.id === id);
+}
+
+export function planNameKey(id: PlanId): string {
+  return `plan_${id}_name`;
 }

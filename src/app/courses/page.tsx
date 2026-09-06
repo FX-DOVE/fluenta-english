@@ -4,27 +4,28 @@ import { useMemo, useState } from "react";
 import { COURSES } from "@/data/courses";
 import { CourseCard } from "@/components/CourseCard";
 import { useLanguage } from "@/lib/LanguageContext";
+import { CATEGORY_KEYS, categoryLabel } from "@/lib/i18n";
+import { courseCopy } from "@/lib/courseI18n";
 import { cn } from "@/lib/utils";
 
-const CATS = ["All", "General", "Speaking", "Grammar", "Career", "Listening"] as const;
-
 export default function CoursesPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [cat, setCat] = useState<string>("All");
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
     return COURSES.filter((c) => {
       const catOk = cat === "All" || c.category === cat;
+      const loc = courseCopy(c, lang);
       const qq = q.trim().toLowerCase();
       const qOk =
         !qq ||
-        c.title.toLowerCase().includes(qq) ||
+        loc.title.toLowerCase().includes(qq) ||
         c.instructor.toLowerCase().includes(qq) ||
-        c.subtitle.toLowerCase().includes(qq);
+        loc.subtitle.toLowerCase().includes(qq);
       return catOk && qOk;
     });
-  }, [cat, q]);
+  }, [cat, q, lang]);
 
   const popular = COURSES.filter((c) => c.badge === "Bestseller" || c.badge === "Popular");
 
@@ -49,7 +50,6 @@ export default function CoursesPage() {
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {/* Udemy rail */}
         <h2 className="mb-3 font-display text-2xl font-semibold text-ink-900">
           {t("rail_popular")}
         </h2>
@@ -59,9 +59,20 @@ export default function CoursesPage() {
           ))}
         </div>
 
-        {/* Filter pills */}
         <div className="mb-6 flex flex-wrap gap-2">
-          {CATS.map((c) => (
+          <button
+            type="button"
+            onClick={() => setCat("All")}
+            className={cn(
+              "rounded-full border px-4 py-2 text-sm font-semibold transition",
+              cat === "All"
+                ? "border-ink-900 bg-ink-900 text-white"
+                : "border-slate-200 bg-white text-slate-700 hover:border-brand-300"
+            )}
+          >
+            {t("catalog_filter")}
+          </button>
+          {CATEGORY_KEYS.map((c) => (
             <button
               key={c}
               type="button"
@@ -73,7 +84,7 @@ export default function CoursesPage() {
                   : "border-slate-200 bg-white text-slate-700 hover:border-brand-300"
               )}
             >
-              {c === "All" ? t("catalog_filter") : c}
+              {categoryLabel(lang, c)}
             </button>
           ))}
         </div>
@@ -84,7 +95,7 @@ export default function CoursesPage() {
           ))}
         </div>
         {filtered.length === 0 && (
-          <p className="py-16 text-center text-slate-500">No courses match your filters.</p>
+          <p className="py-16 text-center text-slate-500">{t("catalog_empty")}</p>
         )}
       </div>
     </div>

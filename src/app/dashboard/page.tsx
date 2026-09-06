@@ -13,11 +13,12 @@ import type { ProgressState, User } from "@/lib/types";
 import { ProgressBar } from "@/components/ProgressBar";
 import { StreakWidget } from "@/components/StreakWidget";
 import { useLanguage } from "@/lib/LanguageContext";
+import { courseCopy, courseCategoryLabel } from "@/lib/courseI18n";
 import { Award, BookOpen, LayoutGrid, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [progress, setProgress] = useState<ProgressState>(defaultProgress());
   const [q, setQ] = useState("");
@@ -40,16 +41,24 @@ export default function DashboardPage() {
       const pct = courseProgressPct(c.slug, c.lessons.length);
       if (filter === "inprogress" && !(pct > 0 && pct < 100)) return false;
       if (filter === "done" && pct < 100) return false;
+      const loc = courseCopy(c, lang);
       const qq = q.trim().toLowerCase();
-      if (qq && !c.title.toLowerCase().includes(qq) && !c.category.toLowerCase().includes(qq))
+      if (
+        qq &&
+        !loc.title.toLowerCase().includes(qq) &&
+        !c.category.toLowerCase().includes(qq) &&
+        !courseCategoryLabel(c, lang).toLowerCase().includes(qq)
+      )
         return false;
       return true;
     });
-  }, [enrolledCourses, filter, q]);
+  }, [enrolledCourses, filter, q, lang]);
 
   const continueCourse =
     enrolledCourses.find((c) => courseProgressPct(c.slug, c.lessons.length) < 100) ??
     COURSES[0];
+
+  const continueLoc = courseCopy(continueCourse, lang);
 
   const doneLessons = Object.values(progress.completedLessons).reduce(
     (a, b) => a + b.length,
@@ -59,8 +68,8 @@ export default function DashboardPage() {
   const nextLesson = (() => {
     const done = progress.completedLessons[continueCourse.slug] ?? [];
     return (
-      continueCourse.lessons.find((l) => !done.includes(l.slug)) ??
-      continueCourse.lessons[0]
+      continueLoc.lessons.find((l) => !done.includes(l.slug)) ??
+      continueLoc.lessons[0]
     );
   })();
 
@@ -89,7 +98,6 @@ export default function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           <div>
-            {/* Continue */}
             <div className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
               <div className="grid sm:grid-cols-[200px_1fr]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -102,11 +110,10 @@ export default function DashboardPage() {
                   <p className="text-xs font-bold uppercase tracking-wide text-brand-600">
                     {t("dash_continue")}
                   </p>
-                  <h2 className="mt-1 text-xl font-bold text-brand-800">
-                    {continueCourse.title}
-                  </h2>
+                  <h2 className="mt-1 text-xl font-bold text-brand-800">{continueLoc.title}</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    {continueCourse.category} · Next: {nextLesson.title}
+                    {courseCategoryLabel(continueCourse, lang)} · {t("dash_next")}:{" "}
+                    {nextLesson.title}
                   </p>
                   <ProgressBar
                     className="mt-3"
@@ -122,7 +129,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Moodle-style overview toolbar */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-lg font-bold text-ink-900">{t("dash_overview")}</h2>
               <div className="flex flex-wrap items-center gap-2">
@@ -132,8 +138,8 @@ export default function DashboardPage() {
                   className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                 >
                   <option value="all">{t("dash_filter_all")}</option>
-                  <option value="inprogress">In progress</option>
-                  <option value="done">Completed</option>
+                  <option value="inprogress">{t("dash_filter_progress")}</option>
+                  <option value="done">{t("dash_filter_done")}</option>
                 </select>
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -154,6 +160,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               {list.map((c) => {
                 const pct = courseProgressPct(c.slug, c.lessons.length);
+                const loc = courseCopy(c, lang);
                 return (
                   <Link
                     key={c.slug}
@@ -166,9 +173,9 @@ export default function DashboardPage() {
                     <img src={c.image} alt="" className="h-32 w-full object-cover" />
                     <div className="p-4">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        {c.category}
+                        {courseCategoryLabel(c, lang)}
                       </p>
-                      <h3 className="mt-1 font-bold text-brand-800">{c.title}</h3>
+                      <h3 className="mt-1 font-bold text-brand-800">{loc.title}</h3>
                       <ProgressBar className="mt-3" value={pct} />
                       <p className="mt-1 text-xs font-semibold text-slate-500">{pct}%</p>
                     </div>
@@ -178,7 +185,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right sidebar — Moodle widgets */}
           <aside className="space-y-4">
             <StreakWidget streak={progress.streak} />
 
@@ -196,12 +202,12 @@ export default function DashboardPage() {
               <h3 className="font-bold text-ink-900">{t("dash_announcements")}</h3>
               <ul className="mt-3 space-y-3 text-sm">
                 <li className="border-l-4 border-brand-400 pl-3">
-                  <p className="font-semibold text-ink-900">Nueva lección LIVE esta semana</p>
-                  <p className="text-xs text-slate-500">Fluenta Team · hoy</p>
+                  <p className="font-semibold text-ink-900">{t("dash_ann_1")}</p>
+                  <p className="text-xs text-slate-500">{t("dash_ann_1_meta")}</p>
                 </li>
                 <li className="border-l-4 border-gold-500 pl-3">
-                  <p className="font-semibold text-ink-900">Consejo: practica 15 min al día</p>
-                  <p className="text-xs text-slate-500">Coach Ana · ayer</p>
+                  <p className="font-semibold text-ink-900">{t("dash_ann_2")}</p>
+                  <p className="text-xs text-slate-500">{t("dash_ann_2_meta")}</p>
                 </li>
               </ul>
             </div>
@@ -209,7 +215,7 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
               <h3 className="font-bold text-ink-900">{t("dash_badges")}</h3>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["A1", "Racha 3", "Quiz 80%+"].map((b) => (
+                {["A1", t("dash_badge_streak"), t("dash_badge_quiz")].map((b) => (
                   <span
                     key={b}
                     className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-800"

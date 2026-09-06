@@ -16,6 +16,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { Check, ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
+import { courseCopy } from "@/lib/courseI18n";
 
 export function LessonPlayer({
   course,
@@ -26,7 +27,10 @@ export function LessonPlayer({
   lesson: Lesson;
   lessonIndex: number;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const localized = courseCopy(course, lang);
+  const locLesson =
+    localized.lessons.find((l) => l.slug === lesson.slug) ?? localized.lessons[lessonIndex] ?? lesson;
   const [progress, setProgress] = useState<ProgressState>(defaultProgress());
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -52,7 +56,7 @@ export function LessonPlayer({
           type="button"
           className="fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg lg:hidden"
           onClick={() => setSidebarOpen(true)}
-          aria-label="Open curriculum"
+          aria-label={t("aria_curriculum")}
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -71,7 +75,7 @@ export function LessonPlayer({
                   {course.cefr}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-ink-900">{course.title}</p>
+                  <p className="truncate text-xs font-bold text-ink-900">{localized.title}</p>
                   <p className="text-[10px] text-slate-500">{pct}%</p>
                 </div>
               </div>
@@ -90,7 +94,7 @@ export function LessonPlayer({
             {t("learn_curriculum")}
           </p>
           <nav className="space-y-0.5">
-            {course.lessons.map((l, i) => {
+            {localized.lessons.map((l, i) => {
               const done = completed.includes(l.slug);
               const active = l.slug === lesson.slug;
               return (
@@ -140,7 +144,7 @@ export function LessonPlayer({
         {/* Main content */}
         <article className="relative min-w-0 flex-1 bg-white px-4 pb-28 pt-8 sm:px-8 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
-            {course.title} › Unit {Math.floor(lessonIndex / 3) + 1}
+            {localized.title} › {t("learn_unit", { n: Math.floor(lessonIndex / 3) + 1 })}
           </p>
           <div className="mt-2 flex items-center justify-between gap-3">
             {prev ? (
@@ -151,7 +155,7 @@ export function LessonPlayer({
               <span className="w-5" />
             )}
             <h1 className="text-center font-display text-2xl font-semibold text-ink-900 sm:text-3xl">
-              {lesson.title}
+              {locLesson.title}
             </h1>
             {next ? (
               <Link href={`/learn/${course.slug}/${next.slug}/`} className="text-slate-400 hover:text-brand-600">
@@ -161,16 +165,16 @@ export function LessonPlayer({
               <span className="w-5" />
             )}
           </div>
-          <p className="mt-1 text-center text-sm text-slate-500">{lesson.durationMin} min</p>
+          <p className="mt-1 text-center text-sm text-slate-500">{lesson.durationMin} {t("min")}</p>
 
           <div className="mx-auto mt-8 max-w-2xl">
             <MarkdownLite content={lesson.content} />
           </div>
 
-          {lesson.quiz && lesson.quiz.length > 0 && (
+          {locLesson.quiz && locLesson.quiz.length > 0 && (
             <div className="mx-auto max-w-2xl">
               <Quiz
-                questions={lesson.quiz}
+                questions={locLesson.quiz}
                 onComplete={(score) => {
                   saveQuizScore(course.slug, lesson.slug, score);
                   setProgress(getProgress());
@@ -183,7 +187,7 @@ export function LessonPlayer({
           <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur lg:left-72">
             <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-3">
               <div className="flex items-center gap-2">
-                {course.lessons.map((l) => {
+                {localized.lessons.map((l) => {
                   const done = completed.includes(l.slug);
                   const active = l.slug === lesson.slug;
                   return (

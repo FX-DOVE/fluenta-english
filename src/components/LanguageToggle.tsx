@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const langs: Lang[] = ["es", "en", "ja"];
 
 export function LanguageToggle({ className }: { className?: string }) {
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   return (
     <div
       className={cn(
@@ -16,7 +16,7 @@ export function LanguageToggle({ className }: { className?: string }) {
         className
       )}
       role="group"
-      aria-label="Language"
+      aria-label={t("aria_lang")}
     >
       {langs.map((l) => (
         <button

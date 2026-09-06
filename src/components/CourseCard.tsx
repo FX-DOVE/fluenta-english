@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Course } from "@/lib/types";
 import { Star } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import { courseCopy, courseLevelLabel } from "@/lib/courseI18n";
 import { cn } from "@/lib/utils";
 
 function badgeLabel(badge: Course["badge"], t: (k: string) => string) {
@@ -20,7 +21,8 @@ export function CourseCard({
   course: Course;
   compact?: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const c = courseCopy(course, lang);
   const label = badgeLabel(course.badge, t);
 
   return (
@@ -49,10 +51,10 @@ export function CourseCard({
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-3.5">
         <h3 className="line-clamp-2 min-h-[2.6em] text-[15px] font-bold leading-snug text-ink-900">
-          {course.title}
+          {c.title}
         </h3>
         <p className="truncate text-xs text-slate-500">
-          {course.instructor} · {course.level}
+          {course.instructor} · {courseLevelLabel(course, lang)}
         </p>
         <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
           <span className="inline-flex items-center gap-1 text-sm font-bold text-ink-900">
@@ -60,7 +62,7 @@ export function CourseCard({
             {course.rating.toFixed(1)}
           </span>
           <span className="rounded-full border border-slate-200 px-2 py-0.5 text-[11px] text-slate-500">
-            {course.reviewCount.toLocaleString()} ratings
+            {course.reviewCount.toLocaleString()} {t("ratings")}
           </span>
         </div>
         <p className="text-[11px] font-medium text-slate-500">

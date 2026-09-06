@@ -39,7 +39,7 @@ export function Header() {
               Fluenta
             </span>
             <span className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-600 sm:block">
-              English Academy
+              {t("brand_tag")}
             </span>
           </span>
         </Link>
@@ -81,7 +81,7 @@ export function Header() {
           type="button"
           className="rounded-lg p-2 text-ink-900 md:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Menu"
+          aria-label={t("aria_menu")}
         >
           {open ? <X /> : <Menu />}
         </button>

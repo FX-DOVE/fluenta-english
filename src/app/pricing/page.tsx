@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PLANS } from "@/data/plans";
+import { PLANS, planNameKey } from "@/data/plans";
 import { Check, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -41,7 +41,7 @@ export default function PricingPage() {
                 {t("pricing_popular")}
               </span>
             )}
-            <h2 className="text-lg font-bold text-ink-900">{plan.name}</h2>
+            <h2 className="text-lg font-bold text-ink-900">{t(planNameKey(plan.id))}</h2>
             <p className="mt-1 text-sm text-slate-500">
               {plan.months} {t("pricing_months")}
             </p>
@@ -54,7 +54,7 @@ export default function PricingPage() {
               {plan.features.map((f) => (
                 <li key={f} className="flex gap-2 text-sm text-slate-600">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                  {f}
+                  {t(f)}
                 </li>
               ))}
             </ul>
